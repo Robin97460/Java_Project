@@ -40,19 +40,19 @@ import java.util.List;
 
 public class GameMain extends ApplicationAdapter {
 
-    
-    private SpriteBatch batch; 
-    private ShapeRenderer shapeRenderer; 
-    private OrthographicCamera camera; 
-    private FitViewport viewport; 
 
-    
-    private Stage uiStage; 
-    private Skin skin; 
-    private ButtonGroup<TextButton> toolGroup; 
-    private ButtonGroup<TextButton> buildingGroup; 
+    private SpriteBatch batch;
+    private ShapeRenderer shapeRenderer;
+    private OrthographicCamera camera;
+    private FitViewport viewport;
 
-    
+
+    private Stage uiStage;
+    private Skin skin;
+    private ButtonGroup<TextButton> toolGroup;
+    private ButtonGroup<TextButton> buildingGroup;
+
+
     private Table mainMenuTable;
     private Window pauseWindow;
     private Table optionsMenuTable;
@@ -71,19 +71,19 @@ public class GameMain extends ApplicationAdapter {
     private Label hudCarryLeekLabel;
 
 
-    
+
     private Window planterWindow;
     private Building currentPlanterForUI = null;
 
-    
+
     private Window hqWindow;
     private Building currentHQForUI = null;
 
-    
+
     private Window auctionWindow;
     private Building currentAuctionForUI = null;
 
-    
+
     private Music backgroundMusic;
     private Sound buyItemSound;
     private Sound sellItemSound;
@@ -95,15 +95,15 @@ public class GameMain extends ApplicationAdapter {
     private Sound clearSound;
     private static final float SFX_VOLUME = 0.5f;
 
-    
+
     private PlayerAnimationController playerAnimationController;
     private Vector2 playerPos;
     private final Vector2 conveyorItemTmp = new Vector2();
-    private final float MOVE_SPEED = 5f; 
+    private final float MOVE_SPEED = 5f;
     private static final float PLAYER_SIZE = 1f;
 
-    
-    
+
+
     private Texture tileGrass;
     private Texture tileTilled;
     private Texture hqTexture;
@@ -123,31 +123,32 @@ public class GameMain extends ApplicationAdapter {
     private Texture conveyorBottomTexture;
     private Texture conveyorLeftTexture;
     private Texture gameLogoTexture;
+    private Texture backgroundTexture;
     private final float HQ_SPRITE_SCALE = 1.4f;
     private static final float PLANTER_VISUAL_SCALE = 1.0f;
     private static final float READY_FILTER_SCALE = 0.7f;
 
 
 
-    
-    private static final int MAP_SIZE = 100; 
-    private static final int MAP_OFFSET = 50; 
 
-    private Terrain[][] terrainGrid; 
-    private List<Building> buildings; 
+    private static final int MAP_SIZE = 100;
+    private static final int MAP_OFFSET = 50;
 
-    
-    private String selectedTool = "NONE"; 
-    private Building.Type selectedBuildingType = null; 
-    private int currentRotation = 0; 
+    private Terrain[][] terrainGrid;
+    private List<Building> buildings;
 
-    
+
+    private String selectedTool = "NONE";
+    private Building.Type selectedBuildingType = null;
+    private int currentRotation = 0;
+
+
     private enum GameState { MENU, PLAYING, PAUSED }
     private GameState currentState = GameState.MENU;
     private enum MenuPage { MAIN, OPTIONS, CONTROLS }
     private MenuPage currentMenuPage = MenuPage.MAIN;
 
-    
+
     private String playerName = "Joueur";
     private float musicVolume = 0.1f;
     private int money = 0;
@@ -173,20 +174,23 @@ public class GameMain extends ApplicationAdapter {
      * Initialise la partie technique du jeu: rendu, assets, audio, grille, UI et menu principal.
      */
     public void create() {
-        
+
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         camera = new OrthographicCamera();
-        viewport = new FitViewport(32, 18, camera); 
+        viewport = new FitViewport(32, 18, camera);
 
-        
+
         uiStage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(uiStage); 
+        Gdx.input.setInputProcessor(uiStage);
 
         gameLogoTexture = new Texture("LOGO.png");
         gameLogoTexture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 
-        
+        backgroundTexture = new Texture("background.png");
+        backgroundTexture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+
+
         tileGrass = new Texture("tile_grass.png");
         tileTilled = new Texture("tile_tilled.png");
         hqTexture = new Texture("hq.png");
@@ -207,7 +211,7 @@ public class GameMain extends ApplicationAdapter {
         conveyorLeftTexture = new Texture("Convoyeur_left.png");
 
 
-        
+
         tileGrass.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
         tileTilled.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
         hqTexture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
@@ -228,11 +232,11 @@ public class GameMain extends ApplicationAdapter {
         conveyorLeftTexture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 
 
-        
+
         try {
             if (Gdx.files.internal("music.mp3").exists()) {
                 backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
-                backgroundMusic.setLooping(true); 
+                backgroundMusic.setLooping(true);
                 backgroundMusic.setVolume(musicVolume);
             } else {
                 System.out.println("Fichier music.mp3 introuvable dans assets/");
@@ -250,11 +254,11 @@ public class GameMain extends ApplicationAdapter {
         tillSound = loadSound("Sound_effect/Labourer.ogg");
         clearSound = loadSound("Sound_effect/Clear.ogg");
 
-        
+
         playerAnimationController = new PlayerAnimationController();
         playerPos = new Vector2(0, 0);
 
-        
+
         terrainGrid = new Terrain[MAP_SIZE][MAP_SIZE];
         buildings = new ArrayList<>();
 
@@ -266,7 +270,7 @@ public class GameMain extends ApplicationAdapter {
 
         createUI();
 
-        
+
         showMainMenu();
     }
     /**
@@ -275,32 +279,32 @@ public class GameMain extends ApplicationAdapter {
     private void createUI() {
         skin = new Skin();
 
-        
+
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
         pixmap.fill();
         skin.add("white", new Texture(pixmap));
-        skin.add("default", new BitmapFont()); 
+        skin.add("default", new BitmapFont());
         pixmap.dispose();
 
-        
 
-        
+
+
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
         textButtonStyle.up = skin.newDrawable("white", Color.DARK_GRAY);
         textButtonStyle.down = skin.newDrawable("white", Color.GRAY);
-        textButtonStyle.checked = skin.newDrawable("white", Color.ROYAL); 
+        textButtonStyle.checked = skin.newDrawable("white", Color.ROYAL);
         textButtonStyle.over = skin.newDrawable("white", Color.LIGHT_GRAY);
         textButtonStyle.font = skin.getFont("default");
         skin.add("default", textButtonStyle);
 
-        
+
         Label.LabelStyle labelStyle = new Label.LabelStyle();
         labelStyle.font = skin.getFont("default");
         labelStyle.fontColor = Color.WHITE;
         skin.add("default", labelStyle);
 
-        
+
         TextField.TextFieldStyle textFieldStyle = new TextField.TextFieldStyle();
         textFieldStyle.font = skin.getFont("default");
         textFieldStyle.fontColor = Color.WHITE;
@@ -309,34 +313,34 @@ public class GameMain extends ApplicationAdapter {
         textFieldStyle.background = skin.newDrawable("white", Color.DARK_GRAY);
         skin.add("default", textFieldStyle);
 
-        
+
         Slider.SliderStyle sliderStyle = new Slider.SliderStyle();
         sliderStyle.background = skin.newDrawable("white", Color.DARK_GRAY);
         sliderStyle.knob = skin.newDrawable("white", Color.ROYAL);
         skin.add("default-horizontal", sliderStyle);
 
-        
+
         CheckBox.CheckBoxStyle checkBoxStyle = new CheckBox.CheckBoxStyle();
         checkBoxStyle.checkboxOn = skin.newDrawable("white", Color.GREEN);
         checkBoxStyle.checkboxOff = skin.newDrawable("white", Color.RED);
         checkBoxStyle.font = skin.getFont("default");
         skin.add("default", checkBoxStyle);
 
-        
+
         Window.WindowStyle windowStyle = new Window.WindowStyle(
                 skin.getFont("default"),
                 Color.WHITE,
-                skin.newDrawable("white", new Color(0.1f, 0.1f, 0.1f, 0.9f)) 
+                skin.newDrawable("white", new Color(0.1f, 0.1f, 0.1f, 0.9f))
         );
         skin.add("default", windowStyle);
 
-        
+
         createGameHUD();
         createMainMenuUI();
         createPauseMenuUI();
     }
 
-    
+
     /**
      * Construit le HUD de jeu (build, inventaire, outils) et relie les boutons a leurs actions.
      */
@@ -344,7 +348,7 @@ public class GameMain extends ApplicationAdapter {
         Color panelBg = new Color(0.06f, 0.06f, 0.06f, 0.88f);
         Color sectionBg = new Color(0.15f, 0.15f, 0.15f, 0.95f);
 
-        
+
         Table buildContainer = new Table();
         buildContainer.setFillParent(true);
         buildContainer.left().top().pad(12);
@@ -392,7 +396,7 @@ public class GameMain extends ApplicationAdapter {
         buildContainer.add(buildPanel);
         uiStage.addActor(buildContainer);
 
-        
+
         Table inventoryContainer = new Table();
         inventoryContainer.setFillParent(true);
         inventoryContainer.right().top().pad(12);
@@ -445,7 +449,7 @@ public class GameMain extends ApplicationAdapter {
         inventoryContainer.add(inventoryPanel).width(210);
         uiStage.addActor(inventoryContainer);
 
-        
+
         Table toolContainer = new Table();
         toolContainer.setFillParent(true);
         toolContainer.left().bottom().pad(12);
@@ -492,7 +496,7 @@ public class GameMain extends ApplicationAdapter {
         updateStatsLabel();
     }
 
-    
+
     /**
      * Active un outil terrain, desactive la selection de batiment et ferme les popups ouverts.
      */
@@ -534,7 +538,7 @@ public class GameMain extends ApplicationAdapter {
         }
     }
 
-    
+
     /**
      * Cree les pages du menu principal (main/options/controles) et branche chaque bouton.
      */
@@ -544,7 +548,7 @@ public class GameMain extends ApplicationAdapter {
         mainMenuTable.center();
 
         Image logoImage = new Image(gameLogoTexture);
-        float logoMaxSize = 260f;
+        float logoMaxSize = 400f;
         float logoW = gameLogoTexture.getWidth();
         float logoH = gameLogoTexture.getHeight();
         float logoScale = Math.min(logoMaxSize / logoW, logoMaxSize / logoH);
@@ -587,7 +591,7 @@ public class GameMain extends ApplicationAdapter {
             }
         });
 
-        
+
         mainMenuTable.defaults().pad(8);
         mainMenuTable.add(logoImage).width(logoDisplayW).height(logoDisplayH).padBottom(12).row();
         mainMenuTable.add(continueBtn).width(260).height(48).padTop(10).row();
@@ -790,13 +794,13 @@ public class GameMain extends ApplicationAdapter {
         setGameHUDVisible(true);
     }
 
-    
+
     /**
      * Construit la fenetre de pause (volume, reprise, retour menu avec/sans sauvegarde).
      */
     private void createPauseMenuUI() {
         pauseWindow = new Window("PAUSE", skin);
-        pauseWindow.setModal(true); 
+        pauseWindow.setModal(true);
         pauseWindow.setMovable(false);
         pauseWindow.pad(20);
 
@@ -838,14 +842,14 @@ public class GameMain extends ApplicationAdapter {
         pauseWindow.add(abandonBtn).width(200).pad(5).colspan(2).row();
 
         pauseWindow.pack();
-        
+
         pauseWindow.setPosition(
                 Gdx.graphics.getWidth() / 2f - pauseWindow.getWidth() / 2f,
                 Gdx.graphics.getHeight() / 2f - pauseWindow.getHeight() / 2f
         );
 
         uiStage.addActor(pauseWindow);
-        pauseWindow.setVisible(false); 
+        pauseWindow.setVisible(false);
     }
 
     /**
@@ -859,7 +863,7 @@ public class GameMain extends ApplicationAdapter {
         }
     }
 
-    
+
 
     /**
      * Bascule vers l'etat MENU, masque le HUD jeu et prepare les controles du menu.
@@ -868,13 +872,13 @@ public class GameMain extends ApplicationAdapter {
         currentState = GameState.MENU;
         showMainMenuPage();
         pauseWindow.setVisible(false);
-        setGameHUDVisible(false); 
+        setGameHUDVisible(false);
         if (continueBtn != null) continueBtn.setDisabled(!SaveSystem.exists());
 
-        
+
         Gdx.input.setInputProcessor(uiStage);
 
-        
+
         if (backgroundMusic != null && !backgroundMusic.isPlaying()) {
             backgroundMusic.play();
         }
@@ -910,7 +914,7 @@ public class GameMain extends ApplicationAdapter {
     private void pauseGame() {
         currentState = GameState.PAUSED;
         pauseWindow.setVisible(true);
-        pauseWindow.toFront(); 
+        pauseWindow.toFront();
     }
 
     /**
@@ -918,7 +922,7 @@ public class GameMain extends ApplicationAdapter {
      */
     private void setGameHUDVisible(boolean visible) {
         for (com.badlogic.gdx.scenes.scene2d.Actor actor : uiStage.getActors()) {
-            
+
             if (actor.getName() != null && actor.getName().startsWith("HUD_")) {
                 actor.setVisible(visible);
             }
@@ -933,34 +937,41 @@ public class GameMain extends ApplicationAdapter {
     public void render() {
         float dt = Gdx.graphics.getDeltaTime();
 
-        
+
         if (currentState == GameState.PLAYING) {
             handleInput(dt);
 
-            
+
             for (Building b : buildings) {
                 b.update(dt);
             }
             updateConveyors(dt);
 
-            
+
             camera.position.set(playerPos.x, playerPos.y, 0);
             camera.update();
         } else if (currentState == GameState.PAUSED) {
-            
+
             if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
                 resumeGame();
             }
         }
-        
 
-        
-        ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1); 
 
-        
+
+        ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1);
+
+        if (currentState == GameState.MENU) {
+            batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            batch.begin();
+            batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            batch.end();
+        }
+
+
         if (currentState == GameState.PLAYING || currentState == GameState.PAUSED) {
 
-            
+
             batch.setProjectionMatrix(camera.combined);
             batch.begin();
             for (int x = 0; x < MAP_SIZE; x++) {
@@ -975,10 +986,10 @@ public class GameMain extends ApplicationAdapter {
                     batch.draw(tex, x - MAP_OFFSET, y - MAP_OFFSET, 1f, 1f);
                 }
             }
-            batch.end(); 
+            batch.end();
 
 
-            
+
             shapeRenderer.setProjectionMatrix(camera.combined);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             for (Building b : buildings) {
@@ -987,7 +998,7 @@ public class GameMain extends ApplicationAdapter {
                 float wy = b.getGridY() - MAP_OFFSET;
                 boolean drawRect = true;
 
-                
+
                 switch (b.getType()) {
                     case CONVEYOR_BELT: shapeRenderer.setColor(Color.GRAY); break;
                     case PLANTER:
@@ -995,7 +1006,7 @@ public class GameMain extends ApplicationAdapter {
                             drawRect = false;
                             break;
                         }
-                        
+
                         if (b.isPlanterEmpty()) shapeRenderer.setColor(new Color(0.55f, 0.35f, 0.15f, 1f));
                         else if (b.isPlanterReady()) shapeRenderer.setColor(getCropReadyColor(b.getPlanterCrop()));
                         else shapeRenderer.setColor(getCropGrowingColor(b.getPlanterCrop()));
@@ -1014,7 +1025,7 @@ public class GameMain extends ApplicationAdapter {
                     }
                 }
 
-                
+
                 if (b.isConveyor() && b.hasItem()) {
                     Texture heldItemTexture = getCropTexture(b.getHeldItem());
                     if (heldItemTexture == null) {
@@ -1028,20 +1039,20 @@ public class GameMain extends ApplicationAdapter {
             }
             shapeRenderer.end();
 
-            
+
             batch.begin();
             for (Building b : buildings) {
                 if (b.getType() == Building.Type.MAIN_HQ) {
-                    
-                    
+
+
                     final float visualWidth = b.getType().width * HQ_SPRITE_SCALE;
                     final float visualHeight = b.getType().height * HQ_SPRITE_SCALE;
 
-                    
+
                     final float logicalWidth = b.getType().width;
                     final float logicalHeight = b.getType().height;
 
-                    
+
                     float drawX = (b.getGridX() - MAP_OFFSET + logicalWidth / 2f) - (visualWidth / 2f);
                     float drawY = (b.getGridY() - MAP_OFFSET + logicalHeight / 2f) - (visualHeight / 2.2f);
 
@@ -1109,7 +1120,7 @@ public class GameMain extends ApplicationAdapter {
                     }
                 }
             }
-            batch.end(); 
+            batch.end();
 
             Gdx.gl.glEnable(Gdx.gl.GL_BLEND);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -1125,14 +1136,14 @@ public class GameMain extends ApplicationAdapter {
             }
             shapeRenderer.end();
 
-            
+
             Vector3 worldMouse = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
             int mouseWorldX = MathUtils.floor(worldMouse.x);
             int mouseWorldY = MathUtils.floor(worldMouse.y);
 
             if (currentState == GameState.PLAYING) {
                 shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-                
+
                 if (!selectedTool.equals("NONE") && selectedBuildingType == null && !selectedTool.equals("BULLDOZE")) {
                     shapeRenderer.setColor(isInInteractionRange(mouseWorldX, mouseWorldY) ? Color.YELLOW : Color.RED);
                     shapeRenderer.rect(mouseWorldX, mouseWorldY, 1, 1);
@@ -1140,13 +1151,13 @@ public class GameMain extends ApplicationAdapter {
                 shapeRenderer.end();
 
                 shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-                
+
                 if (selectedBuildingType != null) {
                     boolean ok = isInInteractionRange(mouseWorldX, mouseWorldY) && canPlaceBuilding(selectedBuildingType, mouseWorldX + MAP_OFFSET, mouseWorldY + MAP_OFFSET);
                     shapeRenderer.setColor(ok ? new Color(0f, 1f, 0f, 0.25f) : new Color(1f, 0f, 0f, 0.25f));
                     shapeRenderer.rect(mouseWorldX, mouseWorldY, selectedBuildingType.width, selectedBuildingType.height);
 
-                    
+
                     shapeRenderer.setColor(Color.YELLOW);
                     float cx = mouseWorldX + selectedBuildingType.width / 2f;
                     float cy = mouseWorldY + selectedBuildingType.height / 2f;
@@ -1162,7 +1173,7 @@ public class GameMain extends ApplicationAdapter {
             }
 
 
-            
+
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             Gdx.gl.glEnable(Gdx.gl.GL_BLEND);
             shapeRenderer.setColor(0.2f, 0.2f, 0.2f, 0.5f);
@@ -1170,7 +1181,7 @@ public class GameMain extends ApplicationAdapter {
             for (int y = 0; y <= MAP_SIZE; y++) shapeRenderer.line(-MAP_OFFSET, y - MAP_OFFSET, MAP_SIZE - MAP_OFFSET, y - MAP_OFFSET);
             shapeRenderer.end();
 
-            
+
             batch.begin();
             TextureRegion playerFrame = playerAnimationController == null ? null : playerAnimationController.getCurrentFrame();
             if (playerFrame != null) {
@@ -1184,17 +1195,17 @@ public class GameMain extends ApplicationAdapter {
             }
             batch.end();
 
-            
+
             if (currentState == GameState.PAUSED) {
                 Gdx.gl.glEnable(Gdx.gl.GL_BLEND);
                 shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
                 shapeRenderer.setColor(0f, 0f, 0f, 0.5f);
-                shapeRenderer.rect(-1000, -1000, 2000, 2000); 
+                shapeRenderer.rect(-1000, -1000, 2000, 2000);
                 shapeRenderer.end();
             }
         }
 
-        
+
         uiStage.act(dt);
         uiStage.draw();
     }
@@ -1202,27 +1213,27 @@ public class GameMain extends ApplicationAdapter {
      * Gere les entrees clavier/souris: deplacements, interactions, outils, placement et pause.
      */
     private void handleInput(float dt) {
-        
+
         if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
             pauseGame();
             return;
         }
 
-        
+
         if (Gdx.input.isKeyJustPressed(Keys.F5)) saveGame();
         if (Gdx.input.isKeyJustPressed(Keys.F9)) loadGame();
 
-        
+
         if (Gdx.input.isKeyJustPressed(Keys.R)) {
             currentRotation = (currentRotation + 1) % 4;
         }
 
-        
+
         if (Gdx.input.isKeyJustPressed(Keys.E)) {
             tryInteract();
         }
 
-        
+
         Vector2 lastPos = new Vector2(playerPos);
         float moveX = 0f;
         float moveY = 0f;
@@ -1251,25 +1262,25 @@ public class GameMain extends ApplicationAdapter {
             playerAnimationController.update(dt, moveX, moveY);
         }
 
-        
+
         if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
             cancelSelection();
             return;
         }
 
-        
+
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-            
+
             Vector2 stageCoords = uiStage.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
             boolean hitUI = uiStage.hit(stageCoords.x, stageCoords.y, true) != null;
             if (hitUI) return;
 
-            
+
             Vector3 worldPos = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
             int worldGridX = MathUtils.floor(worldPos.x);
             int worldGridY = MathUtils.floor(worldPos.y);
 
-            
+
             if (selectedTool.equals("BULLDOZE")) {
                 if (isInInteractionRange(worldGridX, worldGridY)) {
                     deleteBuildingAtWorldCell(worldGridX, worldGridY);
@@ -1277,13 +1288,13 @@ public class GameMain extends ApplicationAdapter {
                 return;
             }
 
-            
+
             if (selectedBuildingType != null) {
                 placeBuilding(worldPos.x, worldPos.y);
                 return;
             }
 
-            
+
             if (!selectedTool.equals("NONE")) {
                 applyTool(worldPos.x, worldPos.y);
             }
@@ -1326,7 +1337,7 @@ public class GameMain extends ApplicationAdapter {
 
         Building nearbyBuilding = null;
 
-        
+
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
                 Building b = getBuildingAtWorldCell(playerWorldX + dx, playerWorldY + dy);
@@ -1342,9 +1353,9 @@ public class GameMain extends ApplicationAdapter {
 
         if (nearbyBuilding == null) return;
 
-        
+
         if (nearbyBuilding.isPlanter()) {
-            
+
             if (!nearbyBuilding.isPlanterEmpty() && nearbyBuilding.isPlanterReady()) {
                 Building.PlanterCrop crop = nearbyBuilding.harvest();
                 int amount = Building.getYieldFor(crop);
@@ -1354,13 +1365,13 @@ public class GameMain extends ApplicationAdapter {
                 playSfx(plantationOutSound);
                 return;
             }
-            
+
             if (nearbyBuilding.isPlanterEmpty()) {
                 openPlanterPopup(nearbyBuilding);
             }
         }
 
-        
+
         else if (nearbyBuilding.isHQ()) {
             openHQPopup(nearbyBuilding);
         } else if (nearbyBuilding.isAuctionHouse()) {
@@ -1393,7 +1404,7 @@ public class GameMain extends ApplicationAdapter {
 
         currentPlanterForUI = planter;
 
-        
+
         com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle ws =
                 new com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle(
                         skin.getFont("default"),
@@ -1458,7 +1469,7 @@ public class GameMain extends ApplicationAdapter {
 
         planterWindow.pack();
 
-        
+
         float cx = (Gdx.graphics.getWidth() - planterWindow.getWidth()) / 2f;
         float cy = (Gdx.graphics.getHeight() - planterWindow.getHeight()) / 2f;
         planterWindow.setPosition(cx, cy);
@@ -1902,22 +1913,22 @@ public class GameMain extends ApplicationAdapter {
     private boolean canPlaceBuilding(Building.Type type, int gridX, int gridY) {
         if (type == null) return false;
 
-        
+
         if (gridX < 0 || gridY < 0) return false;
         if (gridX + type.width > MAP_SIZE) return false;
         if (gridY + type.height > MAP_SIZE) return false;
 
-        
+
         for (int x = gridX; x < gridX + type.width; x++) {
             for (int y = gridY; y < gridY + type.height; y++) {
                 Terrain t = terrainGrid[x][y];
 
-                
+
                 if (type == Building.Type.PLANTER) {
                     if (t.getType() != Terrain.Type.TILLED) return false;
                 }
 
-                
+
                 if (type == Building.Type.MAIN_HQ || type == Building.Type.AUCTION_HOUSE) {
                     if (t.getType() != Terrain.Type.GRASS) return false;
                 }
@@ -1925,7 +1936,7 @@ public class GameMain extends ApplicationAdapter {
             }
         }
 
-        
+
         for (Building b : buildings) {
             if (rectOverlap(gridX, gridY, type.width, type.height,
                     b.getGridX(), b.getGridY(), b.getType().width, b.getType().height)) {
@@ -2032,7 +2043,7 @@ public class GameMain extends ApplicationAdapter {
         return dx <= 1 && dy <= 1;
     }
 
-    
+
     /**
      * Serialize l'etat complet de la partie et l'enregistre via SaveSystem.
      */
@@ -2163,7 +2174,7 @@ public class GameMain extends ApplicationAdapter {
 
                     buildings.add(b);
                 } catch (Exception ignored) {
-                    
+
                 }
             }
         }
@@ -2179,7 +2190,7 @@ public class GameMain extends ApplicationAdapter {
      */
     private Terrain.Type mapLegacyTerrainOrdinal(int legacyOrdinal) {
         if (legacyOrdinal == 2) return Terrain.Type.TILLED;
-        
+
         return Terrain.Type.GRASS;
     }
 
@@ -2474,7 +2485,7 @@ public class GameMain extends ApplicationAdapter {
         viewport.update(width, height);
         uiStage.getViewport().update(width, height, true);
 
-        
+
         if (pauseWindow != null) {
             pauseWindow.setPosition(
                     width / 2f - pauseWindow.getWidth() / 2f,
@@ -2517,6 +2528,7 @@ public class GameMain extends ApplicationAdapter {
         if (conveyorBottomTexture != null) conveyorBottomTexture.dispose();
         if (conveyorLeftTexture != null) conveyorLeftTexture.dispose();
         if (gameLogoTexture != null) gameLogoTexture.dispose();
+        if (backgroundTexture != null) backgroundTexture.dispose();
 
         if (backgroundMusic != null) backgroundMusic.dispose();
         if (buyItemSound != null) buyItemSound.dispose();
