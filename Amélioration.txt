@@ -1,0 +1,9 @@
+Changer la manière d'afficher les tuiles : tile auto-tiling (bitmasking)
+permettras d'afficher une variété de tuiles plus grande et plus jolie.
+
+-----------------------------------------------------------------------
+
+système de quêtes
+
+Ajout d'une ville pour les achat et des pnj
+
